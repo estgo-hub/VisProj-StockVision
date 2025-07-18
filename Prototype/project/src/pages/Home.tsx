@@ -215,29 +215,29 @@ const Home: React.FC = () => {
 
   // Chart data for performance comparison
   const performanceComparisonData = useMemo(() => {
-    const topGainers = stocks
-      .filter(s => s.changePercent > 0)
-      .sort((a, b) => b.changePercent - a.changePercent)
-      .slice(0, 5);
-
-    const topLosers = stocks
-      .filter(s => s.changePercent < 0)
-      .sort((a, b) => a.changePercent - b.changePercent)
-      .slice(0, 5);
-
-    const allStocks = [...topGainers, ...topLosers];
+    // Get top 5 gainers and top 5 losers, sorted properly
+    const sortedStocks = [...stocks].sort((a, b) => b.changePercent - a.changePercent);
+    const topGainers = sortedStocks.slice(0, 5);
+    const topLosers = sortedStocks.slice(-5).reverse(); // Get worst 5 and reverse to show worst first
+    
+    // Combine and sort by performance (best to worst)
+    const allStocks = [...topGainers, ...topLosers].sort((a, b) => b.changePercent - a.changePercent);
 
     return {
       labels: allStocks.map(s => s.ticker),
       datasets: [{
         label: 'Performance %',
         data: allStocks.map(s => s.changePercent),
-        backgroundColor: allStocks.map(s => 
-          s.changePercent >= 0 ? chartColors.success : chartColors.danger
-        ),
-        borderColor: allStocks.map(s => 
-          s.changePercent >= 0 ? chartColors.success : chartColors.danger
-        ),
+        backgroundColor: allStocks.map(s => {
+          if (s.changePercent >= 3) return chartColors.success;
+          if (s.changePercent >= 0) return '#86efac'; // Light green
+          if (s.changePercent >= -3) return '#fca5a5'; // Light red
+          return chartColors.danger;
+        }),
+        borderColor: allStocks.map(s => {
+          if (s.changePercent >= 0) return chartColors.success;
+          return chartColors.danger;
+        }),
         borderWidth: 1,
       }]
     };
@@ -290,6 +290,13 @@ const Home: React.FC = () => {
         borderColor: isDarkMode ? '#374151' : '#e5e7eb',
         borderWidth: 1,
         cornerRadius: 8,
+        callbacks: {
+          label: (context: any) => {
+            const value = context.parsed.y || 0;
+            const stock = context.label;
+            return `${stock}: ${value >= 0 ? '+' : ''}${value.toFixed(2)}%`;
+          }
+        }
       }
     },
     scales: {
@@ -309,6 +316,7 @@ const Home: React.FC = () => {
         },
         ticks: {
           color: isDarkMode ? '#e5e7eb' : '#374151',
+          callback: (value: any) => `${value >= 0 ? '+' : ''}${value}%`
         }
       }
     }
@@ -337,6 +345,61 @@ const Home: React.FC = () => {
     }
   };
 
+  // Specific options for Market Trend chart
+  const marketTrendOptions = {
+    ...chartOptions,
+    scales: {
+      ...chartOptions.scales,
+      y: {
+        ...chartOptions.scales.y,
+        ticks: {
+          ...chartOptions.scales.y.ticks,
+          callback: (value: any) => `${value >= 0 ? '+' : ''}${Number(value).toFixed(1)}%`
+        }
+      }
+    },
+    plugins: {
+      ...chartOptions.plugins,
+      tooltip: {
+        ...chartOptions.plugins.tooltip,
+        callbacks: {
+          label: (context: any) => {
+            const value = context.parsed.y || 0;
+            const day = context.label;
+            return `${day}: ${value >= 0 ? '+' : ''}${value.toFixed(2)}%`;
+          }
+        }
+      }
+    }
+  };
+
+  // Specific options for Industry Market Cap chart
+  const industryMarketCapOptions = {
+    ...chartOptions,
+    scales: {
+      ...chartOptions.scales,
+      y: {
+        ...chartOptions.scales.y,
+        ticks: {
+          ...chartOptions.scales.y.ticks,
+          callback: (value: any) => `$${Number(value).toFixed(0)}B`
+        }
+      }
+    },
+    plugins: {
+      ...chartOptions.plugins,
+      tooltip: {
+        ...chartOptions.plugins.tooltip,
+        callbacks: {
+          label: (context: any) => {
+            const value = context.parsed.y || 0;
+            const industry = context.label;
+            return `${industry}: $${value.toFixed(1)}B market cap`;
+          }
+        }
+      }
+    }
+  };
   const formatMarketCap = (marketCap: number) => {
     if (marketCap >= 1e12) {
       return `$${(marketCap / 1e12).toFixed(1)}T`;
@@ -511,7 +574,7 @@ const Home: React.FC = () => {
               </div>
             </div>
             <div className="h-64">
-              <Line data={marketCapTrendData} options={chartOptions} />
+              <Line data={marketCapTrendData} options={marketTrendOptions} />
             </div>
           </div>
 
@@ -531,7 +594,7 @@ const Home: React.FC = () => {
               </div>
             </div>
             <div className="h-64">
-              <Bar data={industryMarketCapData} options={chartOptions} />
+              <Bar data={industryMarketCapData} options={industryMarketCapOptions} />
             </div>
           </div>
         </div>

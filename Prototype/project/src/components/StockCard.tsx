@@ -1,7 +1,7 @@
 import React from 'react';
 import { Stock } from '../types';
 import { useStock } from '../contexts/StockContext';
-import { Heart, TrendingUp, TrendingDown } from 'lucide-react';
+import { Heart, TrendingUp, TrendingDown, Building, Globe } from 'lucide-react';
 
 interface StockCardProps {
   stock: Stock;
@@ -71,9 +71,15 @@ const StockCard: React.FC<StockCardProps> = ({ stock, onClick }) => {
             {stock.name}
           </p>
           <div className="flex items-center space-x-2 text-xs text-gray-500 dark:text-gray-400">
-            <span>{stock.sector}</span>
+            <span className="flex items-center space-x-1">
+              <Building className="h-3 w-3" />
+              <span>{stock.sector}</span>
+            </span>
             <span>•</span>
-            <span>{stock.country}</span>
+            <span className="flex items-center space-x-1">
+              <Globe className="h-3 w-3" />
+              <span>{stock.exchange}</span>
+            </span>
           </div>
         </div>
         <div className="text-right">
@@ -111,6 +117,22 @@ const StockCard: React.FC<StockCardProps> = ({ stock, onClick }) => {
             {formatVolume(stock.volume)}
           </p>
         </div>
+        {stock.peRatio && (
+          <>
+            <div>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">P/E Ratio</p>
+              <p className="text-sm font-medium text-gray-900 dark:text-white">
+                {stock.peRatio.toFixed(1)}
+              </p>
+            </div>
+            <div>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Region</p>
+              <p className="text-sm font-medium text-gray-900 dark:text-white">
+                {stock.region}
+              </p>
+            </div>
+          </>
+        )}
       </div>
     </div>
   );

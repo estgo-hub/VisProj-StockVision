@@ -4,10 +4,12 @@ import { useTheme } from '../contexts/ThemeContext';
 import { 
   Home, 
   TrendingUp, 
+  PieChart as PieChartIcon,
   Search, 
   PieChart, 
   Globe, 
   Grid3x3, 
+  Briefcase,
   Sun, 
   Moon,
   BarChart3
@@ -19,11 +21,10 @@ const Navigation: React.FC = () => {
 
   const navItems = [
     { path: '/', label: 'Home', icon: Home },
-    { path: '/stock', label: 'Stock Detail', icon: TrendingUp },
-    { path: '/explorer', label: 'Explorer', icon: Search },
+    { path: '/market-overview', label: 'Market Overview', icon: PieChartIcon },
+    { path: '/explorer', label: 'Stock Analysis', icon: Search },
     { path: '/etf', label: 'ETF Analysis', icon: PieChart },
-    { path: '/geography', label: 'Geography', icon: Globe },
-    { path: '/heatmap', label: 'Heatmap', icon: Grid3x3 },
+    { path: '/portfolio', label: 'My Portfolio', icon: Briefcase },
   ];
 
   const isActive = (path: string) => {

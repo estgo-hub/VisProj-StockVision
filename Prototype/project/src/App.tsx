@@ -4,11 +4,10 @@ import { ThemeProvider } from './contexts/ThemeContext';
 import { StockProvider } from './contexts/StockContext';
 import Navigation from './components/Navigation';
 import Home from './pages/Home';
-import StockDetail from './pages/StockDetail';
-import StockExplorer from './pages/StockExplorer';
+import StockAnalysisPage from './pages/StockAnalysisPage';
+import MarketOverview from './pages/MarketOverview';
 import ETFAnalysis from './pages/ETFAnalysis';
-import Geography from './pages/Geography';
-import SectorHeatmap from './pages/SectorHeatmap';
+import Portfolio from './pages/Portfolio';
 
 function App() {
   return (
@@ -19,12 +18,12 @@ function App() {
             <Navigation />
             <Routes>
               <Route path="/" element={<Home />} />
-              <Route path="/stock" element={<StockDetail />} />
-              <Route path="/stock/:id" element={<StockDetail />} />
-              <Route path="/explorer" element={<StockExplorer />} />
+              <Route path="/market-overview" element={<MarketOverview />} />
+              <Route path="/stock" element={<StockAnalysisPage />} />
+              <Route path="/stock/:id" element={<StockAnalysisPage />} />
+              <Route path="/explorer" element={<StockAnalysisPage />} />
               <Route path="/etf" element={<ETFAnalysis />} />
-              <Route path="/geography" element={<Geography />} />
-              <Route path="/heatmap" element={<SectorHeatmap />} />
+              <Route path="/portfolio" element={<Portfolio />} />
             </Routes>
           </div>
         </Router>

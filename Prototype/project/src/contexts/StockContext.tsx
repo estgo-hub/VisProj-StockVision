@@ -6,12 +6,15 @@ interface StockContextType {
   stocks: Stock[];
   etfs: ETF[];
   favorites: Set<string>;
+  loading: boolean;
+  error: string | null;
   addToFavorites: (stockId: string) => void;
   removeFromFavorites: (stockId: string) => void;
   toggleFavorite: (stockId: string) => void;
   searchStocks: (query: string) => Stock[];
   getStockById: (id: string) => Stock | undefined;
   getETFById: (id: string) => ETF | undefined;
+  refreshData: () => Promise<void>;
 }
 
 const StockContext = createContext<StockContextType | undefined>(undefined);
@@ -25,8 +28,10 @@ export const useStock = () => {
 };
 
 export const StockProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [stocks] = useState<Stock[]>(mockStocks);
-  const [etfs] = useState<ETF[]>(mockETFs);
+  const [stocks, setStocks] = useState<Stock[]>(mockStocks);
+  const [etfs, setETFs] = useState<ETF[]>(mockETFs);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [favorites, setFavorites] = useState<Set<string>>(() => {
     const saved = localStorage.getItem('favorites');
     return saved ? new Set(JSON.parse(saved)) : new Set();
@@ -35,6 +40,30 @@ export const StockProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   useEffect(() => {
     localStorage.setItem('favorites', JSON.stringify([...favorites]));
   }, [favorites]);
+
+  // This function will be replaced with actual database calls
+  const refreshData = async () => {
+    setLoading(true);
+    setError(null);
+    
+    try {
+      // TODO: Replace with actual database calls
+      // Example:
+      // const stocksData = await fetchStocksFromDatabase();
+      // const etfsData = await fetchETFsFromDatabase();
+      // setStocks(stocksData);
+      // setETFs(etfsData);
+      
+      // For now, we'll simulate a delay and use mock data
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      setStocks(mockStocks);
+      setETFs(mockETFs);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to fetch data');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const addToFavorites = (stockId: string) => {
     setFavorites(prev => new Set(prev).add(stockId));
@@ -78,12 +107,15 @@ export const StockProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       stocks,
       etfs,
       favorites,
+      loading,
+      error,
       addToFavorites,
       removeFromFavorites,
       toggleFavorite,
       searchStocks,
       getStockById,
-      getETFById
+      getETFById,
+      refreshData
     }}>
       {children}
     </StockContext.Provider>
